@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendas Groovy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        section {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        img {
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        a {
+            display: inline-block;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Agendas Groovy</h1>
+    </header>
+    <section>
+        <img src="img/Groovy.jpg" width="200" alt="Groovy Logo"/>
+        <h2><span style="color:blue">Las Agendas Del Mañana</span></h2>
+        <p>Esta pagina esta orientada a la creación y <br> personalizacion de agendas para eventos</p>
+
+        <form action="/Agendas_Groovy.html" method="post">
+            <label for="Usuario">Usuario</label>
+            <input type="text" id="Usuario" name="Usuario" placeholder="Ejp// Juan Perez"/>
+            
+            <label for="Contraseña">Contraseña</label>
+            <input type="password" id="Contraseña" name="Contraseña" placeholder="Ejp// Nomelace15@">
+            
+            <a href="http://127.0.0.1:5500/Agendas_Groovy.html">Iniciar Sesión</a>
+            <a href="http://127.0.0.1:5500/Registro_Usuarios.html">Registro de Usuario</a>
+        </form>
+    </section>
+</body>
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const usuario = document.getElementById('Usuario').value;
+        const contraseña = document.getElementById('Contraseña').value;
+    
+        // Create FormData object
+        const formData = new FormData();
+        formData.append('usuario', usuario);
+        formData.append('contraseña', contraseña);
+    
+        // Send login request
+        fetch('login.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = 'Agendas_Groovy.html';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error en el inicio de sesión');
+        });
+    });
+    </script>    
+</html>

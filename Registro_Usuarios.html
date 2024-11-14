@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+
+<html>
+<head>
+    <title>Registro_De_Usurio</title>
+</head>
+<body>
+    <h2>Registro de Usuario</h2>
+    <form id="registerForm">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required>
+    <br>
+    <label for="correo">Correo:</label>
+    <input type="email" id="correo" name="correo" required>
+    <br>
+    <label for="contraseña">Contraseña:</label>
+    <input type="password" id="contraseña" name="contraseña" required>
+    <br>
+    <button type="submit">Registrar</button>
+    </form>
+</body>
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nombre = document.getElementById('nombre').value;
+        const correo = document.getElementById('correo').value;
+        const contraseña = document.getElementById('contraseña').value;
+    
+        // Password validation
+        if (contraseña.length < 8) {
+            alert('La contraseña debe tener al menos 8 caracteres');
+            return;
+        }
+    
+        // Create FormData object to send to server
+        const formData = new FormData();
+        formData.append('nombre', nombre);
+        formData.append('correo', correo);
+        formData.append('contraseña', contraseña);
+    
+        // Send data to server
+        fetch('register.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Usuario registrado exitosamente');
+                document.getElementById('registerForm').reset();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al registrar usuario');
+            console.log(error);
+        });
+    });
+    </script>
+    
+</html>
