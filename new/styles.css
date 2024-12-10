@@ -1,0 +1,275 @@
+* {
+    margin: auto;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+}
+
+#auth {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+button {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#calendar {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+#eventList {
+    list-style: none;
+    margin: 1rem 0 2rem 0;
+}
+
+#eventList li {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+
+#downloadEvents {
+    margin-top: 1rem;
+    background-color: #27ae60;
+}
+
+#downloadEvents:hover {
+    background-color: #219a52;
+}
+
+@media (max-width: 768px) {
+    #auth {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    body {
+        padding: 1rem;
+    }
+    /* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+}
+#calendar-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+
+}
+
+#calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+#weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: #f5f5f5;
+    padding: 1px 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+
+
+#calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: #a7a7a7;
+    border: #000000;
+    padding: 1px;
+}
+#calendar-grid div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;  /* Fija un ancho consistente para todas las celdas */
+    height: 50px; /* Fija una altura consistente para todas las celdas */
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #000000;
+    cursor: pointer;
+}
+
+#calendar-grid div:hover {
+    background-color: #f0f0f0;
+    border: 1px solid #000000;
+}
+
+.calendar-day {
+    min-height: 100px;
+    padding: 5px;
+    background: white;
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    background: #000000;
+}
+#calendar {
+    display: none;
+}
+
+#auth {
+    display: block;
+}
+#authSection {
+    position: relative; /* Puedes eliminar el z-index si no es necesario */
+}
+
+#calendarSection {
+    position: relative;
+    display: none; /* Oculto inicialmente */
+}
+/* Add these styles to your CSS */
+.day.event {
+    border: 2px solid #4CAF50;
+    border-radius: 50%;
+    font-weight: bold;
+    color: #2196F3;
+    background-color: #E3F2FD;
+    transform: scale(0.9);
+    transition: all 0.2s ease;
+}
+
+.day.event:hover {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+    cursor: pointer;
+}
+
+.day {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+}
+/* Add these styles for the edit button */
+.edit-btn {
+    margin-left: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: none;
+    background-color: #2196F3;
+    color: white;
+    cursor: pointer;
+}
+
+.edit-btn:hover {
+    background-color: #1976D2;
+}
+.today {
+    background-color: #0f83f0;
+    font-weight: bold;
+}
+
+.has-event {
+    background-color: #f0f9ff;
+}
+
+.empty {
+    background-color: #f5f5f5;
+}
+
+
