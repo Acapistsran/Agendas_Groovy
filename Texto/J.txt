@@ -1,3 +1,0 @@
-<a target="_blank" href="https://www.google.com.mx">Ir a Google</ahref>
-    <label for="Iniciar Sesión" >Iniciar Sesión</label>
-    <input type="submit" name="Iniciar Sesión" >
