@@ -1,5 +1,7 @@
 // Constants
+
 const BASE_URL = 'https://servidoragendas.abymint.com';
+
 
 
 // Create toggleSections in the global scope
@@ -122,6 +124,7 @@ async function loadEvents() {
     }
 }
 
+
 // Add this function to check for time conflicts
 async function checkTimeConflicts(newDate) {
     try {
@@ -141,6 +144,7 @@ async function checkTimeConflicts(newDate) {
     }
 }
 
+
 // Add Event
 eventFormModal.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -151,10 +155,13 @@ eventFormModal.addEventListener('submit', async (e) => {
     const time = document.getElementById('modalEventTime').value;
     let dateObject = new Date(date);
 
+
+    // Si hay hora seleccionada, ajustarla en el objeto de fecha
     if (time) {
         const [hours, minutes] = time.split(':');
         dateObject.setHours(hours, minutes);
     }
+
 
     // Check for time conflicts
     const conflictingEvent = await checkTimeConflicts(dateObject);
@@ -167,6 +174,7 @@ eventFormModal.addEventListener('submit', async (e) => {
     }
 
     const editId = eventFormModal.dataset.editId;
+
     const url = editId ? `${BASE_URL}/events/${editId}` : `${BASE_URL}/events`;
     const method = editId ? 'PUT' : 'POST';
 
@@ -186,8 +194,10 @@ eventFormModal.addEventListener('submit', async (e) => {
 
         if (response.ok) {
             alert(editId ? 'Evento actualizado con éxito!' : 'Evento añadido con éxito!');
-            resetForm();
-            fetchEvents();
+
+            resetForm(); // Reiniciar el formulario después de éxito
+            fetchEvents(); // Recargar los eventos después de agregar o actualizar
+
         } else {
             const data = await response.json();
             alert(`Fallo al ${editId ? 'actualizar' : 'añadir'} el evento: ${data.error}`);
@@ -197,7 +207,6 @@ eventFormModal.addEventListener('submit', async (e) => {
         alert(`Error al ${editId ? 'actualizar' : 'añadir'} el evento.`);
     }
 });
-
 
 
 
