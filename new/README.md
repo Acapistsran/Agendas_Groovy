@@ -175,3 +175,6 @@ Solución de Problemas Comunes
   
 
 - Verificar que las URLs en el frontend coincidan con los túneles actuales
+
+NOTA: la aplicacion ya esta hosteada desde mi pc en https://agendasgroovy.abymint.com/
+Si quieren hostearlo en su pc pueden seguir los pasos de este README.md

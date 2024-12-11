@@ -1,5 +1,5 @@
 // Constants
-const BASE_URL = 'https://merchants-headset-republicans-coleman.trycloudflare.com';
+const BASE_URL = 'https://servidoragendas.abymint.com';
 
 
 // Create toggleSections in the global scope
@@ -122,6 +122,25 @@ async function loadEvents() {
     }
 }
 
+// Add this function to check for time conflicts
+async function checkTimeConflicts(newDate) {
+    try {
+        const response = await fetch(`${BASE_URL}/events`, {
+            method: 'GET',
+            headers: { token: userToken },
+        });
+        const events = await response.json();
+        
+        return events.find(event => {
+            const existingDate = new Date(event.date);
+            return existingDate.getTime() === newDate.getTime();
+        });
+    } catch (error) {
+        console.error('Error checking time conflicts:', error);
+        return null;
+    }
+}
+
 // Add Event
 eventFormModal.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -132,13 +151,22 @@ eventFormModal.addEventListener('submit', async (e) => {
     const time = document.getElementById('modalEventTime').value;
     let dateObject = new Date(date);
 
-    // Si hay hora seleccionada, ajustarla en el objeto de fecha
     if (time) {
         const [hours, minutes] = time.split(':');
         dateObject.setHours(hours, minutes);
     }
 
-    const editId = eventFormModal.dataset.editId; // Obtén el ID del evento si existe
+    // Check for time conflicts
+    const conflictingEvent = await checkTimeConflicts(dateObject);
+    
+    if (conflictingEvent) {
+        const proceed = confirm(`There is already an event "${conflictingEvent.title}" scheduled at this time. Do you want to add this event anyway?`);
+        if (!proceed) {
+            return;
+        }
+    }
+
+    const editId = eventFormModal.dataset.editId;
     const url = editId ? `${BASE_URL}/events/${editId}` : `${BASE_URL}/events`;
     const method = editId ? 'PUT' : 'POST';
 
@@ -158,8 +186,8 @@ eventFormModal.addEventListener('submit', async (e) => {
 
         if (response.ok) {
             alert(editId ? 'Evento actualizado con éxito!' : 'Evento añadido con éxito!');
-            resetForm(); // Reiniciar el formulario después de éxito
-            fetchEvents(); // Recargar los eventos después de agregar o actualizar
+            resetForm();
+            fetchEvents();
         } else {
             const data = await response.json();
             alert(`Fallo al ${editId ? 'actualizar' : 'añadir'} el evento: ${data.error}`);
@@ -169,6 +197,8 @@ eventFormModal.addEventListener('submit', async (e) => {
         alert(`Error al ${editId ? 'actualizar' : 'añadir'} el evento.`);
     }
 });
+
+
 
 
 // Delete Event
