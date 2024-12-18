@@ -104,7 +104,7 @@ app.delete('/events/:id', async (req, res) => {
         res.status(400).json({ error: 'Error deleting event' });
     }
 });
-
+//Unused function, will get deleted
 app.get('/download', async (req, res) => {
     const { token } = req.headers;
     try {

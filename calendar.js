@@ -47,22 +47,36 @@ function updateEventList(showAllEvents = false) {
     if (!eventList) return;
     
     eventList.innerHTML = '';
-    let eventsToShow = showAllEvents ? events : filterEventsByMonth(events, currentDate);
-    const sortedEvents = [...eventsToShow].sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    // Add toggle button
     const toggleBtn = document.createElement('button');
-    toggleBtn.textContent = showAllEvents ? 'Show Current Month' : 'Show All Events';
+    toggleBtn.className = 'toggle-events-btn';
+    toggleBtn.textContent = showAllEvents ? 'Mostrar Solo Este Mes' : 'Mostrar Todos los Eventos';
     toggleBtn.onclick = () => updateEventList(!showAllEvents);
     eventList.appendChild(toggleBtn);
+    
+    const currentMonthEvents = events.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate.getMonth() === currentDate.getMonth() && 
+               eventDate.getFullYear() === currentDate.getFullYear();
+    });
+    const sortedEvents = currentMonthEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+
+    if (sortedEvents.length === 0) {
+        const noEvents = document.createElement('li');
+        noEvents.textContent = 'No hay eventos este mes';
+        eventList.appendChild(noEvents);
+        return;
+    }
     
     sortedEvents.forEach(event => {
         const eventDate = new Date(event.date);
         const li = document.createElement('li');
-        li.textContent = `${eventDate.toLocaleDateString()} ${eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${event.title}`;
-        if (event.repeat) {
-            li.textContent += ` (Repeats ${event.repeat})`;
-        }
+        li.innerHTML = `
+            <strong>${eventDate.toLocaleDateString()}</strong> 
+            ${eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+            ${event.title}
+            ${event.repeat ? `<em>(Se repite ${event.repeat})</em>` : ''}
+        `;
         li.addEventListener('click', () => openModal(eventDate));
         eventList.appendChild(li);
     });
@@ -329,10 +343,12 @@ function updateEventList() {
 prevMonthBtn.addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
     renderCalendar();
+    updateEventList();
 });
 
 nextMonthBtn.addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar();
+    updateEventList();
 });
 
