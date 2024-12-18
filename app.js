@@ -146,67 +146,6 @@ async function checkTimeConflicts(newDate) {
 
 
 // Add Event
-eventFormModal.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const title = modalEventTitle.value;
-    const description = modalEventDescription.value;
-    const date = eventFormModal.dataset.date;
-    const time = document.getElementById('modalEventTime').value;
-    let dateObject = new Date(date);
-
-
-    // Si hay hora seleccionada, ajustarla en el objeto de fecha
-    if (time) {
-        const [hours, minutes] = time.split(':');
-        dateObject.setHours(hours, minutes);
-    }
-
-
-    // Check for time conflicts
-    const conflictingEvent = await checkTimeConflicts(dateObject);
-    
-    if (conflictingEvent) {
-        const proceed = confirm(`There is already an event "${conflictingEvent.title}" scheduled at this time. Do you want to add this event anyway?`);
-        if (!proceed) {
-            return;
-        }
-    }
-
-    const editId = eventFormModal.dataset.editId;
-
-    const url = editId ? `${BASE_URL}/events/${editId}` : `${BASE_URL}/events`;
-    const method = editId ? 'PUT' : 'POST';
-
-    try {
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                token: userToken,
-            },
-            body: JSON.stringify({
-                title: title.trim(),
-                description: description.trim(),
-                date: dateObject.toISOString(),
-            }),
-        });
-
-        if (response.ok) {
-            alert(editId ? 'Evento actualizado con éxito!' : 'Evento añadido con éxito!');
-
-            resetForm(); // Reiniciar el formulario después de éxito
-            fetchEvents(); // Recargar los eventos después de agregar o actualizar
-
-        } else {
-            const data = await response.json();
-            alert(`Fallo al ${editId ? 'actualizar' : 'añadir'} el evento: ${data.error}`);
-        }
-    } catch (err) {
-        console.error('Error:', err);
-        alert(`Error al ${editId ? 'actualizar' : 'añadir'} el evento.`);
-    }
-});
 
 
 
