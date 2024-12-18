@@ -314,31 +314,49 @@ function openModal(date) {
     eventFormModal.dataset.date = date.toISOString();
 }
 
-function updateEventList() {
+function updateEventList(showAllEvents = false) {
     const eventList = document.getElementById('eventList');
     if (!eventList) return;
     
     eventList.innerHTML = '';
     
-    // Filter events for current month
-    const currentMonthEvents = events.filter(event => {
+    // Botón para alternar entre todos los eventos y eventos del mes actual
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'toggle-events-btn';
+    toggleBtn.textContent = showAllEvents ? 'Mostrar Solo Este Mes' : 'Mostrar Todos los Eventos';
+    toggleBtn.onclick = () => updateEventList(!showAllEvents);
+    eventList.appendChild(toggleBtn);
+
+    // Filtrar eventos según la selección
+    const filteredEvents = showAllEvents ? events : events.filter(event => {
         const eventDate = new Date(event.date);
         return eventDate.getMonth() === currentDate.getMonth() && 
                eventDate.getFullYear() === currentDate.getFullYear();
     });
     
-    const sortedEvents = [...currentMonthEvents].sort((a, b) => new Date(a.date) - new Date(b.date));
+    // Ordenar eventos por fecha
+    const sortedEvents = filteredEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    if (sortedEvents.length === 0) {
+        const noEvents = document.createElement('li');
+        noEvents.textContent = showAllEvents ? 'No hay eventos registrados' : 'No hay eventos este mes';
+        eventList.appendChild(noEvents);
+        return;
+    }
     
     sortedEvents.forEach(event => {
         const eventDate = new Date(event.date);
         const li = document.createElement('li');
-        const repeatInfo = event.repeat ? ` (Repeats ${event.repeat})` : '';
-        li.textContent = `${eventDate.toLocaleDateString()} ${eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${event.title}${repeatInfo}`;
+        li.innerHTML = `
+            <strong>${eventDate.toLocaleDateString()}</strong> 
+            ${eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+            ${event.title}
+            ${event.repeat ? `<em>(Se repite ${event.repeat})</em>` : ''}
+        `;
         li.addEventListener('click', () => openModal(eventDate));
         eventList.appendChild(li);
     });
 }
-
 // Navegación entre meses
 prevMonthBtn.addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
