@@ -300,9 +300,38 @@ function openModal(date) {
             editBtn.textContent = '✏️';
             editBtn.classList.add('edit-btn');
             editBtn.onclick = () => setupEventEdit(event);
-
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.onclick = async () => {
+                if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
+                    try {
+                        const response = await fetch(`${BASE_URL}/events/${event._id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                token: userToken
+                            }
+                        });
+            
+                        if (response.ok) {
+                            alert('Evento eliminado con éxito');
+                            await fetchEvents();
+                            renderCalendar();
+                            openModal(date);
+                        } else {
+                            alert('Error al eliminar el evento');
+                        }
+                    } catch (err) {
+                        console.error('Error:', err);
+                        alert('Error al eliminar el evento');
+                    }
+                }
+            };            
             li.appendChild(eventDiv);
             li.appendChild(editBtn);
+            li.appendChild(deleteBtn); // Agregar después de li.appendChild(editBtn);
+
             eventListModal.appendChild(li);
         });
     } else {
