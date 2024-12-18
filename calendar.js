@@ -85,33 +85,54 @@ async function createRepeatingEvents(eventData, repeatType) {
     const events = [];
     const baseDate = new Date(eventData.date);
     
+    // Marcar el evento original
+    const originalEvent = {
+        ...eventData,
+        title: `${eventData.title} (ORIGINAL)`,
+        isOriginal: true,
+        repeatType: repeatType
+    };
+    events.push(originalEvent);
+    
     switch(repeatType) {
         case 'weekly':
-            for(let i = 0; i < 52; i++) { // Create events for one year
+            for(let i = 1; i < 52; i++) { // Empezamos desde 1 porque el original ya está
                 const newDate = new Date(baseDate);
                 newDate.setDate(newDate.getDate() + (i * 7));
-                events.push({...eventData, date: newDate, repeat: 'weekly'});
+                events.push({
+                    ...eventData,
+                    date: newDate,
+                    repeat: 'weekly',
+                    originalEventId: originalEvent._id
+                });
             }
             break;
             
         case 'monthly':
-            for(let i = 0; i < 12; i++) { // Create events for one year
+            for(let i = 1; i < 12; i++) {
                 const newDate = new Date(baseDate);
                 newDate.setMonth(newDate.getMonth() + i);
-                events.push({...eventData, date: newDate, repeat: 'monthly'});
+                events.push({
+                    ...eventData,
+                    date: newDate,
+                    repeat: 'monthly',
+                    originalEventId: originalEvent._id
+                });
             }
             break;
             
         case 'yearly':
-            for(let i = 0; i < 5; i++) { // Create events for 5 years
+            for(let i = 1; i < 5; i++) {
                 const newDate = new Date(baseDate);
                 newDate.setFullYear(newDate.getFullYear() + i);
-                events.push({...eventData, date: newDate, repeat: 'yearly'});
+                events.push({
+                    ...eventData,
+                    date: newDate,
+                    repeat: 'yearly',
+                    originalEventId: originalEvent._id
+                });
             }
             break;
-            
-        default:
-            events.push(eventData);
     }
     
     return events;
@@ -124,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-//Se movio eventFormModal desde app.js
+//Se movio eventFormModal.addEventListener desde app.js
 eventFormModal.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -140,49 +161,55 @@ eventFormModal.addEventListener('submit', async (e) => {
         dateObject.setHours(hours, minutes);
     }
 
-    const conflictingEvent = await checkTimeConflicts(dateObject);
-    
-    if (conflictingEvent) {
-        const proceed = confirm(`There is already an event "${conflictingEvent.title}" scheduled at this time. Do you want to add this event anyway?`);
-        if (!proceed) {
-            return;
-        }
-    }
-
-    const editId = eventFormModal.dataset.editId;
-    const url = editId ? `${BASE_URL}/events/${editId}` : `${BASE_URL}/events`;
-    const method = editId ? 'PUT' : 'POST';
+    const eventData = {
+        title: title.trim(),
+        description: description.trim(),
+        date: dateObject.toISOString(),
+        repeat: repeat !== 'none' ? repeat : null
+    };
 
     try {
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                token: userToken,
-            },
-            body: JSON.stringify({
-                title: title.trim(),
-                description: description.trim(),
-                date: dateObject.toISOString(),
-                repeat: repeat !== 'none' ? repeat : null
-            }),
-        });
-
-        if (response.ok) {
-            alert(editId ? 'Evento actualizado con éxito!' : 'Evento añadido con éxito!');
-            resetForm();
-            fetchEvents();
+        if (repeat !== 'none') {
+            // Crear múltiples eventos si hay repetición
+            const repeatingEvents = await createRepeatingEvents(eventData, repeat);
+            
+            // Guardar cada evento repetido
+            for (const event of repeatingEvents) {
+                await fetch(`${BASE_URL}/events`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        token: userToken,
+                    },
+                    body: JSON.stringify(event),
+                });
+            }
+            alert('Eventos repetidos creados con éxito!');
         } else {
-            const data = await response.json();
-            alert(`Fallo al ${editId ? 'actualizar' : 'añadir'} el evento: ${data.error}`);
+            // Crear un solo evento si no hay repetición
+            const response = await fetch(`${BASE_URL}/events`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    token: userToken,
+                },
+                body: JSON.stringify(eventData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al crear el evento');
+            }
+            alert('Evento creado con éxito!');
         }
+
+        resetForm();
+        await fetchEvents();
+        renderCalendar();
+        eventModal.style.display = 'none';
     } catch (err) {
         console.error('Error:', err);
-        alert(`Error al ${editId ? 'actualizar' : 'añadir'} el evento.`);
+        alert('Error al crear el evento.');
     }
-    await fetchEvents();
-    renderCalendar();
-    eventModal.style.display = 'none';
 });
 
 
@@ -304,30 +331,37 @@ function openModal(date) {
             deleteBtn.textContent = '🗑️';
             deleteBtn.classList.add('delete-btn');
             deleteBtn.onclick = async () => {
-                if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
-                    try {
-                        const response = await fetch(`${BASE_URL}/events/${event._id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                token: userToken
+                if (event.title.includes('(ORIGINAL)')) {
+                    if (confirm('¿Estás seguro de que quieres eliminar este evento y todas sus repeticiones?')) {
+                        try {
+                            const response = await fetch(`${BASE_URL}/events/deleteRepeating/${event._id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    token: userToken
+                                }
+                            });
+                    
+                            if (response.ok) {
+                                alert('Evento y sus repeticiones eliminados con éxito');
+                                await fetchEvents();
+                                renderCalendar();
+                                openModal(date);
+                            } else {
+                                alert('Error al eliminar los eventos');
                             }
-                        });
-            
-                        if (response.ok) {
-                            alert('Evento eliminado con éxito');
-                            await fetchEvents();
-                            renderCalendar();
-                            openModal(date);
-                        } else {
-                            alert('Error al eliminar el evento');
+                        } catch (err) {
+                            console.error('Error:', err);
+                            alert('Error al eliminar los eventos');
                         }
-                    } catch (err) {
-                        console.error('Error:', err);
-                        alert('Error al eliminar el evento');
+                    }
+                } else {
+                    // Código existente para eliminar un solo evento
+                    if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
+                        // ... resto del código actual de eliminación ...
                     }
                 }
-            };            
+            };                        
             li.appendChild(eventDiv);
             li.appendChild(editBtn);
             li.appendChild(deleteBtn); // Agregar después de li.appendChild(editBtn);

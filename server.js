@@ -139,6 +139,45 @@ app.put('/events/:id', async (req, res) => {
         res.status(400).json({ error: 'Error updating event' });
     }
 });
+// Agregar esta nueva ruta después de las rutas existentes
+app.delete('/events/deleteRepeating/:id', async (req, res) => {
+    const { token } = req.headers;
+    const { id } = req.params;
+    
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        
+        // Primero encontramos el evento original
+        const originalEvent = await Event.findOne({ 
+            _id: id, 
+            user: decoded.userId 
+        });
+
+        if (!originalEvent) {
+            return res.status(404).json({ error: 'Evento original no encontrado' });
+        }
+
+        // Encontramos y eliminamos todos los eventos relacionados
+        const eventsToDelete = await Event.find({
+            user: decoded.userId,
+            date: {
+                $gte: originalEvent.date // eventos desde la fecha del original
+            },
+            title: originalEvent.title.replace(' (ORIGINAL)', ''),
+            repeat: originalEvent.repeat
+        });
+
+        // Eliminamos todos los eventos encontrados
+        await Event.deleteMany({
+            _id: { $in: eventsToDelete.map(e => e._id) }
+        });
+
+        res.json({ message: 'Eventos eliminados correctamente' });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ error: 'Error eliminando eventos repetidos' });
+    }
+});
 
 
 // Start server
