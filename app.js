@@ -39,6 +39,79 @@ function handleSuccessfulLogin(token) {
     infoSection.style.display = 'none';
     document.getElementById('calendar').style.display = 'block';
 }
+let userData = null;
+
+function updateUserButton(username) {
+    const userButton = document.getElementById('userButton');
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    userButton.style.display = 'block';
+    userMenuBtn.textContent = username;
+}
+
+function setupUserMenu() {
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+
+    userMenuBtn.addEventListener('click', async () => {
+        userDropdown.classList.toggle('show');
+        try {
+            const response = await fetch(`${BASE_URL}/user`, {
+                headers: { token: userToken }
+            });
+            const userData = await response.json();
+            userInfo.innerHTML = `
+                <p><strong>Usuario:</strong> <span id="usernameDisplay">${userData.username}</span>
+                <button id="editUsername">Editar</button></p>
+                <p><strong>Email:</strong> ${userData.email}</p>
+            `;
+
+            document.getElementById('editUsername').addEventListener('click', () => {
+                const currentUsername = document.getElementById('usernameDisplay').textContent;
+                const newUsername = prompt('Ingresa tu nuevo nombre de usuario:', currentUsername);
+                
+                if (newUsername && newUsername !== currentUsername) {
+                    updateUsername(newUsername);
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('userToken');
+        userToken = null;
+        toggleSections(false);
+        userButton.style.display = 'none';
+        userDropdown.classList.remove('show');
+    });
+}
+async function updateUsername(newUsername) {
+    try {
+        const response = await fetch(`${BASE_URL}/user/update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                token: userToken
+            },
+            body: JSON.stringify({ username: newUsername })
+        });
+
+        if (response.ok) {
+            const updatedUser = await response.json();
+            document.getElementById('usernameDisplay').textContent = updatedUser.username;
+            document.getElementById('userMenuBtn').textContent = updatedUser.username;
+            alert('Nombre de usuario actualizado exitosamente');
+        } else {
+            alert('Error al actualizar el nombre de usuario');
+        }
+    } catch (error) {
+        console.error('Error updating username:', error);
+        alert('Error al actualizar el nombre de usuario');
+    }
+}
 
 
 // Create toggleSections in the global scope
@@ -112,22 +185,27 @@ loginForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ email, password }),
         });
         const data = await response.json();
+        console.log('Respuesta del servidor:', data); // Para debug
 
-        if (response.ok) {
+        if (response.ok && data.user && data.token) {
             userToken = data.token;
+            userData = data.user;
             localStorage.setItem('userToken', userToken);
             alert('Login successful!');
-            toggleSections(true); // Solo aquí debe ir la llamada.
+            updateUserButton(data.user.username);
+            toggleSections(true);
             loadEvents();
-            
+            setupUserMenu();
         } else {
-            alert(`Login failed: ${data.error}`);
+            alert(`Login failed: ${data.error || 'Error en los datos del usuario'}`);
         }
     } catch (error) {
         alert('Error logging in. Please try again.');
         console.log(error);
     }
 });
+
+
 
 
 // Load Events

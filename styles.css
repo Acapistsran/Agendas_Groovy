@@ -232,6 +232,43 @@ button:hover {
     color: #666;
     line-height: 1.5;
 }
+.user-menu {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.user-menu-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.user-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    padding: 12px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.user-dropdown.show {
+    display: block;
+}
+.groovy-logo {
+    display: block;
+    margin: 20px auto;
+    max-width: 300px;
+    height: auto;
+}
 
 .feature-item p {
     color: #666;

@@ -58,11 +58,19 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
         const token = jwt.sign({ userId: user._id }, SECRET, { expiresIn: '1h' });
-        res.json({ token });
+        res.json({ 
+            token,
+            user: {
+                username: user.username,
+                email: user.email,
+                id: user._id
+            }
+        });
     } catch (err) {
         res.status(500).json({ error: 'Error logging in' });
     }
 });
+
 
 app.post('/events', async (req, res) => {
     const { title, description, date } = req.body;
@@ -176,6 +184,56 @@ app.delete('/events/deleteRepeating/:id', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(400).json({ error: 'Error eliminando eventos repetidos' });
+    }
+});
+// Ruta para obtener información del usuario
+app.get('/user', async (req, res) => {
+    const { token } = req.headers;
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        const user = await User.findById(decoded.userId).select('-password');
+        res.json(user);
+    } catch (err) {
+        res.status(400).json({ error: 'Error fetching user data' });
+    }
+});
+
+// Ruta para actualizar el nombre de usuario
+app.put('/user/update', async (req, res) => {
+    const { token } = req.headers;
+    const { username } = req.body;
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        const user = await User.findByIdAndUpdate(
+            decoded.userId,
+            { username },
+            { new: true }
+        ).select('-password');
+        res.json(user);
+    } catch (err) {
+        res.status(400).json({ error: 'Error updating user data' });
+    }
+});
+
+// Modificar la ruta de login para incluir los datos del usuario
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        const token = jwt.sign({ userId: user._id }, SECRET, { expiresIn: '1h' });
+        res.json({ 
+            token,
+            user: {
+                username: user.username,
+                email: user.email,
+                id: user._id
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Error logging in' });
     }
 });
 
