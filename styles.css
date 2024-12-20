@@ -199,11 +199,80 @@ button:hover {
     color: #333;
     margin-bottom: 10px;
 }
+/* Agregar al archivo styles.css */
+.info-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.feature-item {
+    flex-basis: 250px;
+    margin: 15px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.feature-item h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
 
 .feature-item p {
     color: #666;
     line-height: 1.5;
 }
+
+.feature-item p {
+    color: #666;
+    line-height: 1.5;
+}
+.profile-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.profile-button:hover {
+    background-color: #45a049;
+}
+
+.profile-info {
+    padding: 20px;
+    line-height: 1.6;
+}
+
+#logoutBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#logoutBtn:hover {
+    background-color: #da190b;
+}
+
 
 
 #calendar-grid {

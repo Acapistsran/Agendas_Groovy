@@ -10,25 +10,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
     const backButtons = document.querySelectorAll('.backButton');
+    const infoSection = document.getElementById('infoSection');
 
     showLoginBtn.addEventListener('click', () => {
         initialButtons.style.display = 'none';
+        infoSection.style.display = 'none';
         loginForm.style.display = 'block';
     });
-
+    
     showSignupBtn.addEventListener('click', () => {
         initialButtons.style.display = 'none';
+        infoSection.style.display = 'none';
         signupForm.style.display = 'block';
     });
-
+    
     backButtons.forEach(button => {
         button.addEventListener('click', () => {
             loginForm.style.display = 'none';
             signupForm.style.display = 'none';
             initialButtons.style.display = 'block';
+            infoSection.style.display = 'block';
         });
     });
 });
+function handleSuccessfulLogin(token) {
+    localStorage.setItem('token', token);
+    document.getElementById('auth').style.display = 'none';
+    infoSection.style.display = 'none';
+    document.getElementById('calendar').style.display = 'block';
+}
 
 
 // Create toggleSections in the global scope
