@@ -171,6 +171,39 @@ button:hover {
     font-weight: bold;
 }
 
+/* Agregar al archivo styles.css */
+.info-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.feature-item {
+    flex-basis: 250px;
+    margin: 15px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.feature-item h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.feature-item p {
+    color: #666;
+    line-height: 1.5;
+}
 
 
 #calendar-grid {
@@ -217,6 +250,41 @@ button:hover {
 }
 #authSection {
     position: relative; /* Puedes eliminar el z-index si no es necesario */
+}
+/* Agregar estos estilos al archivo styles.css */
+#initialButtons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#initialButtons button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+}
+
+#initialButtons button:hover {
+    background-color: #45a049;
+}
+
+.backButton {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.backButton:hover {
+    background-color: #da190b;
 }
 
 #calendarSection {

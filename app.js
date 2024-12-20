@@ -2,6 +2,33 @@
 
 const BASE_URL = 'https://servidoragendas.abymint.com';
 
+// Agregar esto al inicio del archivo app.js
+document.addEventListener('DOMContentLoaded', () => {
+    const showLoginBtn = document.getElementById('showLogin');
+    const showSignupBtn = document.getElementById('showSignup');
+    const initialButtons = document.getElementById('initialButtons');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const backButtons = document.querySelectorAll('.backButton');
+
+    showLoginBtn.addEventListener('click', () => {
+        initialButtons.style.display = 'none';
+        loginForm.style.display = 'block';
+    });
+
+    showSignupBtn.addEventListener('click', () => {
+        initialButtons.style.display = 'none';
+        signupForm.style.display = 'block';
+    });
+
+    backButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'none';
+            initialButtons.style.display = 'block';
+        });
+    });
+});
 
 
 // Create toggleSections in the global scope
